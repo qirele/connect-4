@@ -75,11 +75,11 @@ function GameController(
   };
 
   const checkWinner = () => {
-    /* win conditions (directions)
-      (row, col) left (0, -4), right (0, +4), up (-4, 0), down (+4, 0)
-      (row, col) top left (-4, -4), top right (-4, +4), bottom left (+4, -4), bottom right (+4, +4)
-      check on every Cell();
-    */
+    /*  win conditions (directions)
+        (row, col) left (0, -4), right (0, +4), up (-4, 0), down (+4, 0)
+        (row, col) top left (-4, -4), top right (-4, +4), bottom left (+4, -4), bottom right (+4, +4)
+        check on every Cell();    */
+
     const boardArr = board.getBoard();
     const rightBoundary = boardArr[0].length - 1;
     const bottomBoundary = boardArr.length - 1;
@@ -87,6 +87,7 @@ function GameController(
     const allEqual = arr => arr.every(val => val.getValue() === arr[0].getValue());
     const hasEmptyCell = arr => arr.some(val => val.getValue() === 0);
     const identifyPlayer = arr => players[0].token === arr[0].getValue() ? players[0].name : players[1].name;
+    const isWinner = arr => !hasEmptyCell(arr) && allEqual(arr) && arr.length === 4;
 
     for (let i = 0; i < boardArr.length; i++) {
       for (let j = 0; j < boardArr[i].length; j++) {
@@ -94,25 +95,25 @@ function GameController(
 
         // check left 4 in a row 
         let left = boardArr[i].slice(j - 3, j + 1);
-        if (!hasEmptyCell(left) && allEqual(left) && left.length === 4) { // winner
+        if (isWinner(left)) {
           return identifyPlayer(left);
         }
 
         // check right 4 in a row
         let right = boardArr[i].slice(j, j + 4);
-        if (!hasEmptyCell(right) && allEqual(right) && right.length === 4) { // winner
+        if (isWinner(right)) {
           return identifyPlayer(right);
         }
 
         // check up 4 in a column 
         let up = boardArr.slice(i - 3, i + 1).map(row => row[j]);
-        if (!hasEmptyCell(up) && allEqual(up) && up.length === 4) { // winner
+        if (isWinner(up)) {
           return identifyPlayer(up);
         }
 
         // check down 4 in a column
         let down = boardArr.slice(i, i + 4).map(row => row[j]);
-        if (!hasEmptyCell(down) && allEqual(down) && down.length === 4) { // winner
+        if (isWinner(down)) {
           return identifyPlayer(down);
         }
 
@@ -120,7 +121,7 @@ function GameController(
         let outOfBoundaries = i - 3 < 0 || j - 3 < 0;
         if (!outOfBoundaries) {
           const topLeft = [boardArr[i][j], boardArr[i - 1][j - 1], boardArr[i - 2][j - 2], boardArr[i - 3][j - 3]];
-          if (!hasEmptyCell(topLeft) && allEqual(topLeft) && topLeft.length === 4) { // winner
+          if (isWinner(topLeft)) {
             return identifyPlayer(topLeft);
           }
         }
@@ -129,7 +130,7 @@ function GameController(
         outOfBoundaries = i - 3 < 0 || j + 3 > rightBoundary;
         if (!outOfBoundaries) {
           const topRight = [boardArr[i][j], boardArr[i - 1][j + 1], boardArr[i - 2][j + 2], boardArr[i - 3][j + 3]];
-          if (!hasEmptyCell(topRight) && allEqual(topRight) && topRight.length === 4) { // winner
+          if (isWinner(topRight)) {
             return identifyPlayer(topRight);
           }
         }
@@ -138,7 +139,7 @@ function GameController(
         outOfBoundaries = i + 3 > bottomBoundary || j - 3 < 0;
         if (!outOfBoundaries) {
           const bottomLeft = [boardArr[i][j], boardArr[i + 1][j - 1], boardArr[i + 2][j - 2], boardArr[i + 3][j - 3]];
-          if (!hasEmptyCell(bottomLeft) && allEqual(bottomLeft) && bottomLeft.length === 4) { // winner
+          if (isWinner(bottomLeft)) {
             return identifyPlayer(bottomLeft);
           }
         }
@@ -147,7 +148,7 @@ function GameController(
         outOfBoundaries = i + 3 > bottomBoundary || j + 3 > rightBoundary;
         if (!outOfBoundaries) {
           const bottomRight = [boardArr[i][j], boardArr[i + 1][j + 1], boardArr[i + 2][j + 2], boardArr[i + 3][j + 3]];
-          if (!hasEmptyCell(bottomRight) && allEqual(bottomRight) && bottomRight.length === 4) { // winner
+          if (isWinner(bottomRight)) {
             return identifyPlayer(bottomRight);
           }
         }
