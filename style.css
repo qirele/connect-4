@@ -34,3 +34,15 @@ body {
   background: lightyellow;
   cursor: pointer;
 }
+
+.cell.red {
+  background-color: red;
+}
+
+.cell.yellow {
+  background-color: yellow;
+}
+
+.cell.gray {
+  background-color: gray;
+}

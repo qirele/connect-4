@@ -17,7 +17,7 @@ function Gameboard() {
   const dropToken = (column, player) => {
     const availableCells = board.filter((row) => row[column].getValue() === 0).map(row => row[column]);
 
-    if (!availableCells.length) return;
+    if (!availableCells.length) return -1;
 
     const lowestRow = availableCells.length - 1;
     board[lowestRow][column].addToken(player);
@@ -156,19 +156,19 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
       return "tie"
     }
 
-    return "nothing"; // its just a regular move that doesn't make game end
+    return -1; // its just a regular move that doesn't make game end
   }
 
 
   const playRound = (column) => {
     if (column > board.getBoard()[0].length - 1) {
       console.log("Input something in range of (0,6)");
-      return;
+      return -2;
     }
 
     if (isGameOver) {
       console.log("The game is over. Start a new game!");
-      return;
+      return -3;
     }
 
     console.log(
@@ -176,10 +176,15 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     );
     currentMoveNum++;
 
-    board.dropToken(column, getActivePlayer().token);
+    const returnCode = board.dropToken(column, getActivePlayer().token);
+    if (returnCode === -1) {
+      console.log(`There isn't enough space in column=${column}`);
+      return -4;
+    }
+
     const winner = checkWinner();
-    if (winner === "nothing") {
-      console.log("No winner this round. sad")
+    if (winner === -1) {
+      console.log("No winner this round. sad");
     } else if (winner === "tie") {
       console.log(`Thats a tie!`);
       isGameOver = true;
@@ -190,6 +195,8 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     switchPlayerTurn();
     printNewRound();
+
+    return winner;
   };
 
   printNewRound();
@@ -201,14 +208,12 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   };
 }
 
-const game = GameController();
-
 function ScreenController() {
   const game = GameController();
   const playerTurnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
 
-  const updateScreen = () => {
+  const updateScreen = (status) => {
     // clear the board
     boardDiv.textContent = "";
 
@@ -216,14 +221,28 @@ function ScreenController() {
     const board = game.getBoard();
     const activePlayer = game.getActivePlayer();
 
-    // Display player's turn
-    playerTurnDiv.textContent = `${activePlayer.name}'s turn...`
+    if (status === -1) {
+      // Display player's turn
+      playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
+    } else if (status === -2) {
+      playerTurnDiv.textContent = `${activePlayer.name}, please input something in range of (0,6)`;
+    }
+    else if (status === -4) {
+      playerTurnDiv.textContent = `There isn't enough space in this column`;
+    } else if (status === "tie") {
+      playerTurnDiv.textContent = "Thats a tie!";
+    } else {
+      if (status !== -3) {
+        playerTurnDiv.textContent = `Winner is ${status}`;
+      }
+    }
 
     // Render board squares
     board.forEach(row => {
       row.forEach((cell, index) => {
         const cellButton = document.createElement("button");
         cellButton.classList.add("cell");
+        cellButton.classList.add(cell.getValue() === 1 ? `red` : (cell.getValue() === 2 ? `yellow` : `gray`));
         cellButton.dataset.column = index;
         cellButton.textContent = cell.getValue();
         boardDiv.appendChild(cellButton);
@@ -237,15 +256,15 @@ function ScreenController() {
     // Make sure I've clicked a column and not the gaps in between
     if (!selectedColumn) return;
 
-    game.playRound(selectedColumn);
-    updateScreen();
+    const status = game.playRound(selectedColumn);
+    updateScreen(status);
   }
   boardDiv.addEventListener("click", clickHandlerBoard);
 
   // Initial render
-  updateScreen();
+  updateScreen(-1);
 
   // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
 }
 
-// ScreenController();
+ScreenController();
