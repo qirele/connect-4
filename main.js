@@ -10,6 +10,8 @@ function Gameboard() {
     }
   }
 
+  const getDimensions = () => { return { rows, columns } };
+
   const getBoard = () => board;
 
   const dropToken = (column, player) => {
@@ -27,7 +29,7 @@ function Gameboard() {
     console.log(boardWithCellValues);
   };
 
-  return { getBoard, dropToken, printBoard };
+  return { getBoard, dropToken, printBoard, getDimensions };
 }
 
 function Cell() {
@@ -45,29 +47,23 @@ function Cell() {
   };
 }
 
-function GameController(
-  playerOneName = "Player One",
-  playerTwoName = "Player Two"
-) {
+function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
+
   const board = Gameboard();
 
-  const players = [
-    {
-      name: playerOneName,
-      token: 1
-    },
-    {
-      name: playerTwoName,
-      token: 2
-    }
-  ];
+  const { rows, columns } = board.getDimensions();
+  const maxMoveNum = rows * columns;
+  let currentMoveNum = 0;
+
+  let isGameOver = false;
+
+  const players = [{ name: playerOneName, token: 1 }, { name: playerTwoName, token: 2 }];
 
   let activePlayer = players[0];
 
-  const switchPlayerTurn = () => {
-    activePlayer = activePlayer === players[0] ? players[1] : players[0];
-  };
   const getActivePlayer = () => activePlayer;
+
+  const switchPlayerTurn = () => { activePlayer = activePlayer === players[0] ? players[1] : players[0]; };
 
   const printNewRound = () => {
     board.printBoard();
@@ -91,7 +87,7 @@ function GameController(
 
     for (let i = 0; i < boardArr.length; i++) {
       for (let j = 0; j < boardArr[i].length; j++) {
-        console.log(` (${i}, ${j}) Checking if there is a winner in all directions`);
+        // console.log(` (${i}, ${j}) Checking if there is a winner in all directions`);
 
         // check left 4 in a row 
         let left = boardArr[i].slice(j - 3, j + 1);
@@ -156,24 +152,41 @@ function GameController(
       }
     }
 
-    return "nothing";
+    if (currentMoveNum === maxMoveNum) { // if its the last move and upper conditions didn't met, we have a tie
+      return "tie"
+    }
 
+    return "nothing"; // its just a regular move that doesn't make game end
   }
 
 
   const playRound = (column) => {
+    if (column > board.getBoard()[0].length - 1) {
+      console.log("Input something in range of (0,6)");
+      return;
+    }
+
+    if (isGameOver) {
+      console.log("The game is over. Start a new game!");
+      return;
+    }
+
     console.log(
       `Dropping ${getActivePlayer().name}'s token into column ${column}...`
     );
+    currentMoveNum++;
 
     board.dropToken(column, getActivePlayer().token);
     const winner = checkWinner();
     if (winner === "nothing") {
       console.log("No winner this round. sad")
+    } else if (winner === "tie") {
+      console.log(`Thats a tie!`);
+      isGameOver = true;
     } else {
       console.log(`Winner is ${winner}`);
+      isGameOver = true;
     }
-
 
     switchPlayerTurn();
     printNewRound();
