@@ -12,6 +12,10 @@ body {
   min-height: 100vh;
 }
 
+.container {
+  max-width: 500px;
+}
+
 .board {
   display: grid;
   height: 500px;

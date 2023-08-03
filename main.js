@@ -171,16 +171,16 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
       return -3;
     }
 
-    console.log(
-      `Dropping ${getActivePlayer().name}'s token into column ${column}...`
-    );
-    currentMoveNum++;
-
     const returnCode = board.dropToken(column, getActivePlayer().token);
     if (returnCode === -1) {
       console.log(`There isn't enough space in column=${column}`);
       return -4;
     }
+
+    console.log(
+      `Dropping ${getActivePlayer().name}'s token into column ${column}...`
+    );
+    currentMoveNum++;
 
     const winner = checkWinner();
     if (winner === -1) {
@@ -226,9 +226,8 @@ function ScreenController() {
       playerTurnDiv.textContent = `${activePlayer.name}'s turn...`;
     } else if (status === -2) {
       playerTurnDiv.textContent = `${activePlayer.name}, please input something in range of (0,6)`;
-    }
-    else if (status === -4) {
-      playerTurnDiv.textContent = `There isn't enough space in this column`;
+    } else if (status === -4) {
+      playerTurnDiv.textContent = `${activePlayer.name}, there isn't enough space in this column`;
     } else if (status === "tie") {
       playerTurnDiv.textContent = "Thats a tie!";
     } else {
