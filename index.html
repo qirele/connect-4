@@ -3,14 +3,32 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Connect Four HTML Skeleton</title>
+    <title>Connect Four</title>
     <link href="style.css" rel="stylesheet" type="text/css" />
     <script src="main.js" defer></script>
   </head>
   <body>
     <div class="container">
-      <h1 class="turn"></h1>
-      <div class="board"></div>
+      <div class="container-inner">
+        <h1 class="turn"></h1>
+        <div class="board"></div>
+      </div>
+    </div>
+    <div class="intro-outer">
+      <form class="form-inner">
+        <p class="error"></p>
+        <div class="input-wrapper">
+          <label for="player1">Player 1 name: </label>
+          <input type="text" id="player1" name="player1" />
+        </div>
+        <div class="input-wrapper">
+          <label for="player2">Player 2 name: </label>
+          <input type="text" id="player2" name="player2" />
+        </div>
+        <div class="start-wrapper">
+          <button class="start-btn">Start a new Game!</button>
+        </div>
+      </form>
     </div>
   </body>
 </html>

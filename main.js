@@ -62,11 +62,6 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
   const board = Gameboard();
 
-  const { rows, columns } = board.getDimensions();
-  const maxMoveNum = rows * columns;
-  let currentMoveNum = 0;
-
-  let isGameOver = false;
 
   const players = [{ name: playerOneName, token: 1 }, { name: playerTwoName, token: 2 }];
 
@@ -81,6 +76,10 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     console.log(`${getActivePlayer().name}'s turn.`);
   };
 
+  const { rows, columns } = board.getDimensions();
+  const maxMoveNum = rows * columns;
+  let currentMoveNum = 0;
+  let isGameOver = false;
 
   const boardArr = board.getBoard();
   const rightBoundary = boardArr[0].length - 1;
@@ -227,9 +226,12 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 }
 
 function ScreenController() {
-  const game = GameController();
+  let game;
   const playerTurnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
+  const form = document.querySelector('.form-inner');
+  const error = document.querySelector(".error");
+  const introOuter = document.querySelector(".intro-outer");
 
   const updateScreen = (status) => {
     // clear the board
@@ -249,11 +251,7 @@ function ScreenController() {
     } else if (status === "tie") {
       playerTurnDiv.textContent = "Thats a tie!";
     } else {
-      if (status !== -3) {
-        playerTurnDiv.textContent = `Winner is ${status.winner}, coords = ${status.coords.map(el => `${el.row} ${el.col}`)}`;
-
-
-      }
+      playerTurnDiv.textContent = `Winner is ${status.winner}`;
     }
 
     // Render board squares
@@ -269,16 +267,13 @@ function ScreenController() {
       })
     })
 
-    // render highlighted cells
-    if (!status.coords) {
-      return;
-    }
+    if (!status.coords) return;
 
+    // render highlighted cells
     status.coords.forEach(coord => {
       let btn = document.querySelector(`[data-row="${coord.row}"][data-column="${coord.col}"]`);
       btn.classList.add("highlight");
     });
-
   }
 
   // Add event listener for the board
@@ -288,14 +283,28 @@ function ScreenController() {
     if (!selectedColumn) return;
 
     const status = game.playRound(selectedColumn);
-    updateScreen(status);
+    if (status !== -3) updateScreen(status);  // if -3, then its game over so don't update the screen
   }
   boardDiv.addEventListener("click", clickHandlerBoard);
 
-  // Initial render
-  updateScreen(-1);
+  // Add event listener for game start
+  function handleSubmit(e) {
+    e.preventDefault();
+    const player1 = e.target.player1.value;
+    const player2 = e.target.player2.value;
 
-  // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
+    if (!player1 || !player2) {
+      error.classList.add("active");
+      error.textContent = "Please input yo names in the input fields";
+      return;
+    } 
+
+    error.classList.remove("active");
+    introOuter.classList.add("hide");
+    game = GameController(player1, player2);
+    updateScreen(-1);
+  }
+  form.addEventListener("submit", handleSubmit);
 }
 
 ScreenController();
