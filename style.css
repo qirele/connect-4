@@ -10,7 +10,6 @@ body {
 }
 
 .container {
-  min-height: 100vh;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -75,10 +74,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: all .2s;
+  transform: scale(1);
 }
 
 .intro-outer.hide {
-  visibility: hidden;
+  transform: scale(0);
 }
 
 .error {
@@ -92,7 +93,7 @@ body {
 
 .gameover-screen {
   transform: scale(0);
-  transition: all .3s;
+  transition: all 0.3s;
   text-align: center;
 }
 
@@ -102,11 +103,11 @@ body {
   font-size: 5rem;
 }
 
-.play-again, .msg {
+.btn-wrapper {
   display: none;
   margin: 0 auto;
 }
 
-.gameover-screen.active .play-again, .gameover-screen.active .msg {
+.gameover-screen.active .btn-wrapper {
   display: block;
 }

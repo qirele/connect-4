@@ -238,6 +238,7 @@ function ScreenController() {
   const gameoverDiv = document.querySelector(".gameover-screen");
   const msg = document.querySelector(".gameover-screen .msg");
   const playAgainBtn = document.querySelector(".gameover-screen .play-again");
+  const startAgainBtn = document.querySelector(".gameover-screen .start-again");
 
   const updateScreen = (status) => {
     // clear the board
@@ -306,7 +307,7 @@ function ScreenController() {
       error.classList.add("active");
       error.textContent = "Please input yo names in the input fields";
       return;
-    } 
+    }
 
     error.classList.remove("active");
     introOuter.classList.add("hide");
@@ -323,6 +324,13 @@ function ScreenController() {
     updateScreen(-1);
   }
   playAgainBtn.addEventListener("click", handlePlayAgain);
+
+  // Add event listener for the start again btn
+  function handleStartAgain(e) {
+    introOuter.classList.remove("hide");
+    gameoverDiv.classList.remove("active");
+  }
+  startAgainBtn.addEventListener("click", handleStartAgain);
 }
 
 ScreenController();
