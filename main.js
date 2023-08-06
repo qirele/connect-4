@@ -69,6 +69,8 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
   const getActivePlayer = () => activePlayer;
 
+  const getPlayers = () => players;
+
   const switchPlayerTurn = () => { activePlayer = activePlayer === players[0] ? players[1] : players[0]; };
 
   const printNewRound = () => {
@@ -221,17 +223,21 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
   return {
     playRound,
     getActivePlayer,
-    getBoard: board.getBoard
+    getBoard: board.getBoard,
+    getPlayers
   };
 }
 
 function ScreenController() {
-  let game;
+  let game; // gets initialized in handleSubmit function
   const playerTurnDiv = document.querySelector('.turn');
   const boardDiv = document.querySelector('.board');
   const form = document.querySelector('.form-inner');
   const error = document.querySelector(".error");
   const introOuter = document.querySelector(".intro-outer");
+  const gameoverDiv = document.querySelector(".gameover-screen");
+  const msg = document.querySelector(".gameover-screen .msg");
+  const playAgainBtn = document.querySelector(".gameover-screen .play-again");
 
   const updateScreen = (status) => {
     // clear the board
@@ -248,12 +254,15 @@ function ScreenController() {
       playerTurnDiv.textContent = `${activePlayer.name}, please input something in range of (0,6)`;
     } else if (status === -4) {
       playerTurnDiv.textContent = `${activePlayer.name}, there isn't enough space in this column`;
-    } else if (status === "tie") {
-      playerTurnDiv.textContent = "Thats a tie!";
     } else {
-      playerTurnDiv.textContent = `Winner is ${status.winner}`;
-    }
+      if (status === "tie") {
+        msg.textContent = "Game Over. Tie!";
+      } else {
+        msg.textContent = `Game Over. Congratulations ${status.winner}, You WIN!`;
+      }
+      gameoverDiv.classList.add("active");
 
+    }
     // Render board squares
     board.forEach((row, i) => {
       row.forEach((cell, j) => {
@@ -305,6 +314,15 @@ function ScreenController() {
     updateScreen(-1);
   }
   form.addEventListener("submit", handleSubmit);
+
+  // Add event listener for the play again btn
+  function handlePlayAgain(e) {
+    gameoverDiv.classList.remove("active");
+
+    game = GameController(game.getPlayers()[0].name, game.getPlayers()[1].name);
+    updateScreen(-1);
+  }
+  playAgainBtn.addEventListener("click", handlePlayAgain);
 }
 
 ScreenController();
